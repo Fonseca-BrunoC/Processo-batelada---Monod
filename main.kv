@@ -1,0 +1,61 @@
+<Main>:
+    MDBoxLayout:
+        orientation: 'vertical'
+
+        MDBoxLayout:
+            MDFloatLayout:
+                MDRoundFlatIconButton:
+                    id: load_button
+                    pos_hint: {'center_x': 0.5, 'top':0.8}
+                    size_hint_y: 0.15
+                    size_hint_x: 0.2
+                    height: 30
+                    text: 'Load excel file'
+                    icon: 'folder'
+                    on_release: root.show_load()
+
+        MDBoxLayout:
+            MDFloatLayout:
+                MDRoundFlatButton:
+                    id: load_button
+                    pos_hint: {'center_x': 0.5, 'top':0.4}
+                    size_hint_y: 0.15
+                    size_hint_x: 0.2
+                    height: 30
+                    text: 'Iniciar modelagem'
+                    on_release: root.show_result()
+
+
+<LoadDialog>
+    MDBoxLayout:
+        orientation: 'vertical'
+        pos: root.pos
+        size: root.size
+        FileChooserIconView:
+            id: loadfile
+            on_selection: root.load(loadfile.path, loadfile.selection), root.cancel()
+
+
+        MDBoxLayout:
+            size_hint_y: 0.08
+            MDFloatLayout:
+                MDRectangleFlatButton:
+                    pos_hint:{'center_x':0.5, 'center_y':0.5}
+                    text: "Cancel"
+                    on_release: root.cancel()
+
+<ResultDialog>
+    MDBoxLayout:
+        id: tabela
+        pos: root.pos
+        size: root.size
+
+
+    MDBoxLayout:
+        size_hint_y: 0.08
+        pos: root.pos
+        MDFloatLayout:
+            MDRectangleFlatButton:
+                pos_hint:{'center_x':0.5, 'center_y':0.2}
+                text: "Voltar"
+                on_release: root.cancel2()
