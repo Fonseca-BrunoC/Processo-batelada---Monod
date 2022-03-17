@@ -2,7 +2,7 @@ from kivy.lang import Builder
 from kivymd.app import MDApp
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.anchorlayout import AnchorLayout
-from kivymd.uix.button import MDRectangleFlatButton
+from kivymd.uix.button import MDRectangleFlatButton, MDRaisedButton
 #from kivy.garden.matplotlib.backend_kivyagg import FigureCanvasKivyAgg
 #import matplotlib.pyplot as plt
 import numpy as np
@@ -16,11 +16,21 @@ import pandas as pd
 import shutil
 from kivymd.uix.datatables import MDDataTable
 from kivy.metrics import dp
+from kivymd.uix.dialog import MDDialog
+from kivymd.uix.boxlayout import MDBoxLayout
 
 
 class LoadDialog(FloatLayout):
     load = ObjectProperty(None)
     cancel = ObjectProperty(None)
+
+class Grafico(MDBoxLayout):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.g = Main().modelgraph()
+        layout = MDBoxLayout
+        layout.add_widget(self.g())
+
 
 
 class ResultDialog(FloatLayout):
@@ -42,6 +52,17 @@ class ResultDialog(FloatLayout):
         tabela = self.ids.tabela
         tabela.add_widget(Table)
 
+    def show_graph(self):
+        self.dialog=(MDDialog(type= "custom" ,content_cls =Grafico(),
+                              buttons=[MDRaisedButton(text="Fechar", on_press=self.close_dialog)]))
+        self.dialog.open()
+
+
+
+    def close_dialog(self, obj):
+        if Grafico().g == None:
+
+            self.dialog.dismiss()
 
     cancel2 = ObjectProperty(None)
 
@@ -56,19 +77,21 @@ class Main(FloatLayout):
         self._popup.open()
 
     def load(self, path, filename):
+        cwd = os.getcwd()
+
         path_splited = path.split()
         filename2 =''
         for i in path_splited:
             filename2 = filename[0].replace(i, '')
 
-        caminho = rf'{os.path.join(path, filename[0])}'
-        destino = r'C:\Users\user\Documents\Bruno\Kivy_Estudos\Kivy_Modelagem'
+        caminho = f'{os.path.join(path, filename[0])}'
+        destino = cwd
 
         shutil.copy2(caminho,destino)
         filename2 = destino + filename2
-        file_oldname = os.path.join(destino, filename2)
+        #file_oldname = os.path.join(destino, filename2)
         file_newname_newfile = os.path.join(destino, 'Dados.xlsx')
-        shutil.move(file_oldname, file_newname_newfile)
+        shutil.move(filename2, file_newname_newfile)
 
     def show_result(self):
         content2 = ResultDialog(cancel2=self.dismiss_popup)
@@ -80,7 +103,9 @@ class Main(FloatLayout):
     def model(self):
         import modelagem
         return modelagem.result()
-
+    def modelgraph(self):
+        import modelagem
+        return modelagem.plot()
 
 class MyApp(MDApp):
     def build(self):
@@ -89,7 +114,7 @@ class MyApp(MDApp):
         return Main()
 
     def on_stop(self):
-        return os.remove(r'C:\Users\user\Documents\Bruno\Kivy_Estudos\Kivy_Modelagem\Dados.xlsx')
+        return os.remove('Dados.xlsx')
 
 if __name__ == '__main__':
     MyApp().run()
